@@ -89,15 +89,15 @@ export default function Home() {
   const filteredItems = items.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <main className={`flex min-h-screen flex-col items-center justify-center`}>
-      <div className="z-10 max-w-5xl mb-10 w-full items-center justify-center font-mono text-sm ">
-        <h1 className='text-4xl pb-20 text-center'>Pantry Tracker</h1>
-        <div className='bg-zinc-100 shadow-lg p-4 rounded-lg'>
-          <form className='grid grid-cols-6 items-center text-black' onSubmit={addItem}>
+    <main className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="z-10 w-full max-w-3xl items-center justify-center font-mono text-sm">
+        <h1 className='text-4xl pb-10 text-center'>Pantry Tracker</h1>
+        <div className='bg-zinc-100 shadow-lg p-4 rounded-lg w-full'>
+          <form className='grid grid-cols-6 gap-2 items-center text-black' onSubmit={addItem}>
             <input
               value={newItem.name}
               onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-              className='col-span-3 rounded-md p-3 border'
+              className='col-span-3 rounded-md p-2 border'
               type='text'
               placeholder='Enter Item'
             />
@@ -105,49 +105,48 @@ export default function Home() {
               value={newItem.amount}
               onChange={(e) =>
                 setNewItem({ ...newItem, amount: e.target.value })}
-              className='col-span-2 rounded-md p-3 border mx-3'
+              className='col-span-2 rounded-md p-2 border'
               type='number'
               placeholder='Enter Quantity'
             />
             <button
-              className='text-white bg-slate-950 rounded-md hover:bg-slate-500 p-2 text-xl'
+              className='text-white bg-slate-950 rounded-md hover:bg-slate-500 p-2 text-lg'
               type='submit'>
               Add
             </button>
           </form>
           <input
             type="text"
-            className="w-full mt-5 p-2 border rounded-md"
+            className="w-full mt-4 p-2 border rounded-md"
             placeholder="Search items..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <div className='overflow-y-auto h-[450px]'>
+          <div className='overflow-y-auto h-64 mt-4'>
             <ul>
               {filteredItems.length > 0 && (
-                <li className='flex mt-5 w-full justify-between items-center p-3 font-bold'>
-                  <div className='p-4 w-full flex justify-between'>
+                <li className='flex w-full justify-between items-center p-2 font-bold'>
+                  <div className='w-full flex justify-between'>
                     <span className='capitalize'>Item Name</span>
-                    <span className="pr-20">Amount</span>
+                    <span className="pr-9">Amount</span>
                   </div>
                 </li>
               )}
               {filteredItems.map((item, index) => (
                 <li
                   key={index}
-                  className='flex w-full justify-between items-center p-3 '
-                >
-                  <div className='p-4 w-full flex justify-between items-center'>
+                  className='flex w-full justify-between items-center p-2'>
+                  <div className='w-full flex justify-between items-center'>
                     <span className='capitalize'>{item.name}</span>
-                    <div className='flex justify-between items-center'>
+                    <div className='flex items-center'>
                       <button
                         onClick={() => reduceItem(item.id, item.amount)}
-                        className='mr-10 p-2 justify-between border rounded-md border-slate-900 transform hover:scale-110 transition-transform duration-300'>
+                        className='mr-5 p-2 border rounded-md border-slate-900 transform hover:scale-110 transition-transform duration-300'>
                         -
                       </button>
                       <button
                         onClick={() => plusItem(item.id, item.amount)}
-                        className='mr-10 p-2 justify-between border rounded-md border-slate-900 transform hover:scale-110 transition-transform duration-300'>
+                        className='mr-10 p-2 border rounded-md border-slate-900 transform hover:scale-110 transition-transform duration-300'>
                         +
                       </button>
                       <span>{item.amount}</span>
@@ -155,7 +154,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={() => deleteItem(item.id)}
-                    className='ml-8 p-4 border rounded-md border-slate-900 w-16 transform hover:scale-110 transition-transform duration-300'>
+                    className='ml-4 py-2 px-4 border rounded-md border-slate-900 transform hover:scale-110 transition-transform duration-300'>
                     X
                   </button>
                 </li>
@@ -163,9 +162,9 @@ export default function Home() {
             </ul>
           </div>
           {filteredItems.length > 0 && (
-            <div className='flex justify-between my-5 p-3'>
-              <span className="pl-[15px]">Total</span>
-              <span className="pr-[110px]" >{total}</span>
+            <div className='flex justify-between mt-4 p-2'>
+              <span>Total</span>
+              <span>{total}</span>
             </div>
           )}
         </div>
