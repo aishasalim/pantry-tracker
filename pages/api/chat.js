@@ -1,6 +1,7 @@
 import { getTogetherClient } from '../../togetherClient'; 
 import { addDoc, deleteDoc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase.js'; 
+import axios from 'axios'; 
 
 const systemInstructions = `
 You are a Pantry Tracker Support ChatBot. You assist users with managing their pantry items, including adding, editing, and deleting items within the database.
@@ -68,10 +69,11 @@ Error Handling Prompts:
    A: "Unfortunately, once an item is deleted, it cannot be restored. Please be careful when deleting items."
 `;
 
+
 // Helper function to add an item to the pantry associated with the correct user
 async function addItemToPantry(name, count, userId) {
     try {
-      const itemName = name.trim().toLowerCase();
+      const itemName = name.trim().toLowerCase(); // Standardize the item name to lowercase
       await addDoc(collection(db, 'items'), {
         name: itemName,
         amount: count,
@@ -85,8 +87,119 @@ async function addItemToPantry(name, count, userId) {
     }
   }
   
-  // Similar changes apply for deleteItemFromPantry and updateItemQuantity...
+  // Helper function to delete an item associated with the correct user
+  async function deleteItemFromPantry(name, userId) {
+    try {
+      const itemName = name.trim().toLowerCase(); // Standardize the item name to lowercase
+      const q = query(collection(db, 'items'), where('name', '==', itemName), where('userId', '==', userId));
+      const snapshot = await getDocs(q);
   
+      if (snapshot.empty) {
+        console.error(`Item ${itemName} not found for deletion.`);
+        return { success: false, message: `Item ${itemName} not found in your pantry.` };
+      }
+  
+      snapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+      console.log(`Deleted ${itemName} from pantry for user ${userId}.`);
+      return { success: true, message: `${itemName} has been deleted from your pantry.` };
+    } catch (error) {
+      console.error(`Error deleting item ${name}:`, error);
+      return { success: false, message: `Error deleting ${name}. Please try again.` };
+    }
+  }
+  
+  // Helper function to update item quantity associated with the correct user
+  async function updateItemQuantity(name, newQuantity, userId) {
+    const itemName = name.trim().toLowerCase(); // Standardize the item name to lowercase
+    const maxRetries = 3;
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        const q = query(collection(db, 'items'), where('name', '==', itemName), where('userId', '==', userId));
+        const snapshot = await getDocs(q);
+
+        if (snapshot.empty) {
+          console.error(`Item ${itemName} not found on attempt ${attempt + 1}.`);
+          attempt += 1;
+          if (attempt === maxRetries) {
+            return { success: false, message: `Item ${itemName} not found in your pantry.` };
+          }
+          await new Promise((resolve) => setTimeout(resolve, 200)); // Wait before retrying
+          continue;
+        }
+
+        if (typeof newQuantity !== 'number' || isNaN(newQuantity)) {
+          console.error(`Invalid new quantity: ${newQuantity}`);
+          return { success: false, message: `Invalid quantity provided for ${itemName}.` };
+        }
+
+        snapshot.forEach(async (doc) => {
+          await updateDoc(doc.ref, { amount: newQuantity });
+          console.log(`Item ${itemName} updated to ${newQuantity} for user ${userId}.`);
+        });
+
+        return { success: true, message: `The quantity of ${itemName} has been updated to ${newQuantity}.` };
+      } catch (error) {
+        console.error(`Error updating quantity of ${itemName} on attempt ${attempt + 1}:`, error);
+        attempt += 1;
+        if (attempt === maxRetries) {
+          return { success: false, message: `Error updating the quantity of ${itemName}. Please try again.` };
+        }
+        await new Promise((resolve) => setTimeout(resolve, 200)); // Wait before retrying
+      }
+    }
+  }
+
+  // Function to generate a recipe using AI
+  async function generateRecipe(userId, selectedIngredients) {
+    try {
+      // Ensure that we have selected ingredients to generate a recipe
+      if (selectedIngredients.length === 0) {
+        console.error('No ingredients selected for generating a recipe.');
+        return { success: false, message: 'Please select ingredients for generating a recipe.' };
+      }
+
+      // Convert selected ingredients into a single prompt for AI
+      const ingredientsPrompt = selectedIngredients.join(', ');
+
+      // Use Together AI client to generate the recipe
+      const together = getTogetherClient();
+      const aiResponse = await together.chat.completions.create({
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that generates cooking recipes based on provided ingredients.' },
+          { role: 'user', content: `Create a recipe using the following ingredients: ${ingredientsPrompt}. Provide the recipe title, cooking steps, and estimated time.` }
+        ],
+        model: 'gpt-3.5-turbo', // Choose the AI model you prefer
+        max_tokens: 512,
+        temperature: 0.7,
+      });
+
+      // Extract generated recipe data from AI response
+      const recipeContent = aiResponse.choices[0].message.content;
+      const recipeTitle = recipeContent.match(/Title: (.+)/)?.[1] || 'Generated Recipe';
+      const recipeSteps = recipeContent.match(/Steps:([\s\S]*)/)?.[1]?.trim() || 'No steps provided.';
+      const recipeMinutesTakes = recipeContent.match(/Estimated Time: (\d+)/)?.[1] || 'N/A';
+
+      // Add the generated recipe to the 'recipes' collection in Firebase
+      await addDoc(collection(db, 'recipes'), {
+        title: recipeTitle,
+        steps: recipeSteps,
+        minutesTakes: recipeMinutesTakes,
+        createdAt: new Date(),
+        userId: userId,
+      });
+
+      console.log(`Generated recipe "${recipeTitle}" for user ${userId}.`);
+      return { success: true, message: `Generated recipe "${recipeTitle}".`, recipeTitle, recipeMinutesTakes, recipeSteps };
+    } catch (error) {
+      console.error(`Error generating recipe for user ${userId}:`, error);
+      return { success: false, message: `Error generating recipe. Please try again.` };
+    }
+  }
+
   export default async function handler(req, res) {
     console.log('Received request:', req.method, req.body);
   
@@ -139,6 +252,8 @@ async function addItemToPantry(name, count, userId) {
                   result = await deleteItemFromPantry(task.itemName, userId);
                 } else if (task.action === 'update') {
                   result = await updateItemQuantity(task.itemName, task.itemCount, userId);
+                } else if (task.action === 'generateRecipe') { // Handle generate recipe action
+                  result = await generateRecipe(userId);
                 }
   
                 if (!result.success) {

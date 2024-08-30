@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, ArrowUp } from 'lucide-react';
+import { MessageSquare, ArrowUp, LayoutDashboard } from 'lucide-react';
 
 const ChatBot = ({ userId }) => {
   const [input, setInput] = useState('');
@@ -120,10 +120,19 @@ const ChatBot = ({ userId }) => {
         isOpen ? 'h-full' : 'h-12 w-12'}`}
     >
       {!isOpen && (
-        <button onClick={toggleChat} className="p-3 rounded-full bg-gray-100 hover:bg-gray-150 absolute bottom-3 right-4">
+        <button onClick={toggleChat} className="p-3 rounded-full bg-gray-100 hover:bg-gray-150 absolute bottom-2 right-4">
           <MessageSquare />
         </button>
       )}
+
+      {!isOpen && (
+      <button 
+        onClick={() => window.location.href = '/dashboard'}  
+        className="p-3 rounded-full bg-gray-100 hover:bg-gray-150 absolute bottom-2 right-[5em]">
+        <LayoutDashboard />
+      </button>
+      )}
+
       {isOpen && (
         <div className="flex flex-col h-full">
           <div className="flex justify-between items-center p-4 border-b">
@@ -176,6 +185,15 @@ const ChatBot = ({ userId }) => {
           </button>
           <h2 className={`text-lg mr-4 font-semibold ${isOpen ? '' : 'hidden'}`}>Chat Support</h2>
         </div>
+
+        {!isOpen && (
+          <button 
+            onClick={() => window.location.href = '/dashboard'}  
+            className="w-[3em] p-3 mx-2 rounded-lg bg-gray-100 hover:bg-gray-150 transform hover:scale-110 transition-transform duration-300"
+          >
+            <LayoutDashboard />
+          </button>
+        )}
 
         {isOpen && (
           <div className="flex-grow overflow-y-auto p-4 transition-all duration-300 ease-in-out">
