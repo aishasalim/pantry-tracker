@@ -115,7 +115,7 @@ const Dashboard = () => {
 
   return (
 <div className="flex h-screen flex-col">
-  <div className="flex-grow flex">
+  <div className="flex-grow flex overflow-y-auto">
     <div className="flex-grow flex flex-col px-4 md:px-6 py-4">
       {/* Topbar for the Main Table */}
       <div className="w-full text-black border-b flex justify-between items-center pb-4 mb-4">
@@ -136,11 +136,11 @@ const Dashboard = () => {
       {/* Dashboard Content */}
       <div className="flex flex-col-reverse lg:flex-row gap-10">  {/* Changed to flex-col-reverse on small screens */}
         {/* Left Side: Pie Chart and Top Items */}
-        <div className="flex flex-col items-start lg:w-2/5 lg:mr-5 p-4 space-y-4">  {/* Adjust width on large screens */}
-          <div className="w-full">
+        <div className="flex flex-col items-start md:w-full lg:w-full p-4">  {/* Adjust width on large screens */}
+          <div className="w-[25em] mx-5">
             <PantryPieChart />
           </div>
-          <div className="w-full">
+          <div className="w-[10em]">
             <TopItemsList />
           </div>
         </div>

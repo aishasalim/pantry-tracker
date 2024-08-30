@@ -1,7 +1,6 @@
 import { getTogetherClient } from '../../togetherClient'; 
 import { addDoc, deleteDoc, updateDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../firebase.js'; 
-import axios from 'axios'; 
 
 const systemInstructions = `
 You are a Pantry Tracker Support ChatBot. You assist users with managing their pantry items, including adding, editing, and deleting items within the database.
