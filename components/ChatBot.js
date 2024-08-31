@@ -116,31 +116,6 @@ const ChatBot = ({ userId }) => {
     }
   };
 
-  // Function to start video capture
-  const handleStartVideo = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      setVideoStream(stream);
-      setIsVideoOpen(true);
-      
-      // Use useEffect to ensure videoRef is set correctly
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
-    } catch (err) {
-      console.error('Error accessing webcam: ', err);
-    }
-  };
-
-  // Function to stop video capture
-  const handleStopVideo = () => {
-    if (videoStream) {
-      videoStream.getTracks().forEach(track => track.stop());
-      setVideoStream(null);
-    }
-    setIsVideoOpen(false);
-  };
-
   return isSmallScreen ? (
     // On small screens, display chat as a full-screen modal when opened
     <div
@@ -158,14 +133,6 @@ const ChatBot = ({ userId }) => {
         onClick={() => window.location.href = '/dashboard'}  
         className="p-3 rounded-full bg-gray-100 hover:bg-gray-150 absolute bottom-2 right-[5em]">
         <LayoutDashboard />
-      </button>
-      )}
-
-      {!isOpen && (
-      <button 
-        onClick={handleStartVideo}  
-        className="p-3 rounded-full bg-gray-100 hover:bg-gray-150 absolute bottom-2 right-[9em]">
-        <Camera />
       </button>
       )}
 
@@ -210,17 +177,6 @@ const ChatBot = ({ userId }) => {
           </div>
         </div>
       )}
-      
-      {isVideoOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
-          <div className="relative">
-            <video ref={videoRef} autoPlay className="w-full max-w-xl rounded-md" />
-            <button onClick={handleStopVideo} className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full">
-              Stop
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   ) : (
     // Render chat as a sidebar on larger screens
@@ -239,15 +195,6 @@ const ChatBot = ({ userId }) => {
             className="w-[3em] p-3 mx-2 rounded-lg bg-gray-100 hover:bg-gray-150 transform hover:scale-110 transition-transform duration-300"
           >
             <LayoutDashboard />
-          </button>
-        )}
-
-        {!isOpen && (
-          <button 
-            onClick={handleStartVideo}  
-            className="w-[3em] p-3 mx-2 my-3 rounded-lg bg-gray-100 hover:bg-gray-150 transform hover:scale-110 transition-transform duration-300"
-          >
-            <Camera />
           </button>
         )}
 
@@ -288,18 +235,6 @@ const ChatBot = ({ userId }) => {
           </div>
         )}
       </nav>
-      
-      {isVideoOpen && (
-        <div className="fixed top-0 left-0 w-full h-full flex justify-center items-center bg-gray-900 bg-opacity-75">
-          <div className="relative">
-            {/* Ensure video element is set up properly */}
-            <video ref={videoRef} autoPlay className="w-full max-w-xl rounded-md" style={{ display: 'block' }} />
-            <button onClick={handleStopVideo} className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full">
-              Stop
-            </button>
-          </div>
-        </div>
-      )}
     </aside>
   );
 };
