@@ -68,7 +68,6 @@ Error Handling Prompts:
    A: "Unfortunately, once an item is deleted, it cannot be restored. Please be careful when deleting items."
 `;
 
-
 // Helper function to add an item to the pantry associated with the correct user
 async function addItemToPantry(name, count, userId) {
     try {

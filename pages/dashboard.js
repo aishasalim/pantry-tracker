@@ -140,22 +140,22 @@ const Dashboard = () => {
           <div className="w-[25em] mx-5">
             <PantryPieChart />
           </div>
-          <div className="w-[10em]">
+          <div className="w-[10em] mx-5 ">
             <TopItemsList />
           </div>
         </div>
 
         {/* Right Side: Recipes Table */}
-        <div className="lg:w-3/5 mt-4 mx-5 lg:ml-auto">
+        <div className="lg:w-4/5 mt-4 mx-5 lg:ml-auto">
           {/* Generate Recipe Button */}
           <button
             onClick={handleGenerateRecipe}
-            className="py-1.5 px-3 mb-2 rounded-lg bg-green-100 hover:bg-green-200 text-lg transform transition-all duration-300 ease-in-out"
+            className="py-1.5 mx-5 px-3 mb-2 rounded-lg bg-green-100 hover:bg-green-200 text-lg transform transition-all duration-300 ease-in-out"
           >
             Generate Recipe
           </button>
           {/* Current Pantry Items with Checkboxes */}
-          <div className="flex-grow p-4 rounded-lg border mb-5 min-w-[5em] max-h-[18em]">
+          <div className="flex-grow p-4 mx-5 rounded-lg border mb-5 min-w-[5em] max-h-[18em]">
             <ul className="list-none max-h-[80vh] overflow-y-auto">
               {pantryItems.length > 0 && (
                 <li className="flex text-black w-full justify-between items-center p-2 font-bold">
@@ -185,7 +185,7 @@ const Dashboard = () => {
           </div>
 
           {/* Generated Recipes Table */}
-          <div className="border p-4 rounded-lg">
+          <div className="border p-4 mx-5 rounded-lg">
             <h2 className="text-xl font-semibold mb-4">Generated Recipes</h2>
             {recipes.length > 0 ? (
               <table className="w-full border-collapse border border-gray-300">
