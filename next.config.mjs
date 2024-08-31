@@ -3,9 +3,7 @@ const nextConfig = {
   reactStrictMode: true,
   output: 'standalone',
   api: {
-    bodyParser: {
-      sizeLimit: '1mb',
-    },
+    externalResolver: true, // Allow longer time for external requests
   },
   async headers() {
     return [
